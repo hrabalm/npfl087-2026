@@ -94,7 +94,7 @@ Now create a second venv for vLLM and install it in a similar fashion.
 ```bash
 uv venv --seed --python 3.12 ~/venvs.uv/3.12vllm_202602
 source /storage/brno12-cerit/home/hrabalm/venvs.uv/3.12vllm_202602/bin/activate
-uv pip install --torch-backend=cu118 vllm
+uv pip install --torch-backend=cu118 vllm transformers==4.57.3
 ```
 
 

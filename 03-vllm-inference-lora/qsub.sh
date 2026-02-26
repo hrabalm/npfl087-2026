@@ -17,8 +17,8 @@ source /storage/brno12-cerit/home/hrabalm/venvs.uv/3.12vllm_202602/bin/activate
 # because of namespacing, this should not affect other users on the same node
 export CUDA_VISIBLE_DEVICES=0
 
-FILE="$SCRIPT_DIR/predict.py"
-cd "$SCRIPT_DIR"  # note that in some cases this can affect performance, depending on how the cwd is used
+FILE="$PBS_O_WORKDIR/predict.py"
+cd "$PBS_O_WORKDIR"  # note that in some cases this can affect performance, depending on how the cwd is used
 python "$FILE"
 
 clean_scratch
