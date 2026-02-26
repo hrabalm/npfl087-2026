@@ -52,7 +52,7 @@ uv --version
 If the command fails, you might have to set up the PATH environment variables manually, for example:
 
 ```bash
-export PATH=$PATH:/storage/brno12-cerit/home/hrabalm/.local/bin/
+export PATH="/storage/brno12-cerit/home/hrabalm/.local/bin:$PATH"
 ```
 
 Or use it with its absolute path, for example:
