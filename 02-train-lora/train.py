@@ -88,6 +88,7 @@ sft_config = SFTConfig(
     # some other parameters you can play around, these two are for regularization
     # max_grad_norm=0.3,
     # weight_decay=0.1,
+    # report_to="wandb",  # uncomment if you want to use wandb
 )
 
 
