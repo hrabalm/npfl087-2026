@@ -46,6 +46,7 @@ def my_load_dataset():
 
 dataset, eval_dataset = my_load_dataset()
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+
 model = AutoModelForCausalLM.from_pretrained(
     BASE_MODEL,
     dtype=torch.bfloat16,
@@ -62,26 +63,31 @@ peft_config = LoraConfig(
 
 
 sft_config = SFTConfig(
+    # train on assistant tokens only THIS NEEDS a tokenizer.chat_template with generation and endgeneration markers, see above. If you use model without them and can't fix it, just set this to False
+    # assistant_only_loss=True,
+    # Main hyperparameters
     num_train_epochs=1,
     per_device_train_batch_size=4,
     per_device_eval_batch_size=4,
+    gradient_accumulation_steps=1,  # can be used to simulate larger batch sizes
     max_length=1024,  # you should properly set this depending on your data, task, model and VRAM
     learning_rate=4e-5,
-    max_grad_norm=0.3,
-    bf16=True,
-    optim="adamw_8bit",  # saves VRAM
-    weight_decay=0.1,
     lr_scheduler_type="cosine",
     warmup_ratio=0.1,
     eval_steps=50,
     eval_strategy="steps",
     logging_steps=1,
-    gradient_accumulation_steps=1,  # can be used to simulate larger batch sizes
     output_dir=OUTPUT_DIRECTORY,  # where to save the model checkpoints
-    gradient_checkpointing=True,
     seed=42,
     save_strategy="steps",
     save_steps=50,
+    # Technical parameters to save time or VRAM
+    bf16=True,
+    optim="adamw_8bit",  # saves VRAM by using 8-bit optimizers
+    gradient_checkpointing=True,
+    # some other parameters you can play around, these two are for regularization
+    # max_grad_norm=0.3,
+    # weight_decay=0.1,
 )
 
 
@@ -93,8 +99,9 @@ trainer = SFTTrainer(
     processing_class=tokenizer,
     peft_config=peft_config,
 )
-# trainer.evaluate()
+
 try:
+    # Try to resume training from the last checkpoint if it exists. This is useful in case your training gets interrupted or takes longer than 24 hours (maximum runtime for gpu queue on Metacentrum)
     trainer_stats = trainer.train(resume_from_checkpoint=True)
 except ValueError:
     trainer_stats = trainer.train()
